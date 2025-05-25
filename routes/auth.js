@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
 const { register, login, getUserProfile } = require('../controllers/auth/authController');
+const { registerValidator, loginValidator } = require('../validators/auth/authValidators');
+const validate = require('../validators/validationMiddleware');
 
 /**
  * @swagger
@@ -64,7 +66,7 @@ const { register, login, getUserProfile } = require('../controllers/auth/authCon
  *       400:
  *         description: Bad request
  */
-router.post('/register', register);
+router.post('/register', registerValidator, validate, register);
 
 /**
  * @swagger
@@ -101,7 +103,7 @@ router.post('/register', register);
  *       404:
  *         description: User not found
  */
-router.post('/login', login);
+router.post('/login', loginValidator, validate, login);
 
 /**
  * @swagger

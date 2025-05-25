@@ -10,6 +10,16 @@ const {
   deleteEntry,
   generateSummaryForEntry
 } = require('../controllers/dailyEntries/dailyEntriesController');
+const {
+  createEntryValidator,
+  getAllEntriesValidator,
+  getEntryByIdValidator,
+  updateEntryValidator,
+  patchEntryValidator,
+  deleteEntryValidator,
+  generateSummaryValidator
+} = require('../validators/dailyEntries/dailyEntriesValidators');
+const validate = require('../validators/validationMiddleware');
 
 /**
  * @swagger
@@ -181,13 +191,13 @@ const {
  *         description: Entry not found
  */
 
-// Routes with controller functions
-router.post('/', authMiddleware, createEntry);
-router.get('/', authMiddleware, getAllEntries);
-router.get('/:id', authMiddleware, getEntryById);
-router.put('/:id', authMiddleware, updateEntry);
-router.patch('/:id', authMiddleware, patchEntry);
-router.delete('/:id', authMiddleware, deleteEntry);
-router.get('/:id/generate-summary', authMiddleware, generateSummaryForEntry);
+// Routes with controller functions and validators
+router.post('/', authMiddleware, createEntryValidator, validate, createEntry);
+router.get('/', authMiddleware, getAllEntriesValidator, validate, getAllEntries);
+router.get('/:id', authMiddleware, getEntryByIdValidator, validate, getEntryById);
+router.put('/:id', authMiddleware, updateEntryValidator, validate, updateEntry);
+router.patch('/:id', authMiddleware, patchEntryValidator, validate, patchEntry);
+router.delete('/:id', authMiddleware, deleteEntryValidator, validate, deleteEntry);
+router.get('/:id/generate-summary', authMiddleware, generateSummaryValidator, validate, generateSummaryForEntry);
 
 module.exports = router;

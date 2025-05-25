@@ -3,6 +3,13 @@ const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
 const storyController = require('../controllers/story/storyController');
+const {
+  generateStoryValidator,
+  getStoryByIdValidator,
+  deleteStoryValidator,
+  getAllStoriesValidator
+} = require('../validators/story/storyValidators');
+const validate = require('../validators/validationMiddleware');
 
 /**
  * @swagger
@@ -30,7 +37,7 @@ const storyController = require('../controllers/story/storyController');
  *       500:
  *         description: Server error
  */
-router.post('/generate', authMiddleware, storyController.generateStory);
+router.post('/generate', authMiddleware, generateStoryValidator, validate, storyController.generateStory);
 
 /**
  * @swagger
@@ -64,7 +71,7 @@ router.post('/generate', authMiddleware, storyController.generateStory);
  *       500:
  *         description: Server error
  */
-router.get('/', authMiddleware, storyController.getAllStories);
+router.get('/', authMiddleware, getAllStoriesValidator, validate, storyController.getAllStories);
 
 /**
  * @swagger
@@ -105,7 +112,7 @@ router.get('/', authMiddleware, storyController.getAllStories);
  *       500:
  *         description: Server error
  */
-router.get('/:id', authMiddleware, storyController.getStoryById);
+router.get('/:id', authMiddleware, getStoryByIdValidator, validate, storyController.getStoryById);
 
 /**
  * @swagger
@@ -132,6 +139,6 @@ router.get('/:id', authMiddleware, storyController.getStoryById);
  *       500:
  *         description: Server error
  */
-router.delete('/:id', authMiddleware, storyController.deleteStory);
+router.delete('/:id', authMiddleware, deleteStoryValidator, validate, storyController.deleteStory);
 
 module.exports = router;
