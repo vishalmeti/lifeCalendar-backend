@@ -5,6 +5,7 @@ const mongodb = require('./config/db');
 const listEndpoints = require('express-list-endpoints');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const serverless = require('serverless-http');
 
 // Swagger configuration
 const swaggerOptions = {
@@ -59,3 +60,10 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   console.log(`Swagger documentation available at http://localhost:${PORT}/api/v1/api-docs`);
 });
+
+const handler = serverless(async (req, res) => {
+  await mongodb(); // Ensure DB connection is established for serverless
+  return app(req, res);
+});
+
+module.exports = handler;
