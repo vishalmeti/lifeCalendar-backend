@@ -67,22 +67,6 @@ http://localhost:3000/api/v1/api-docs
 
 ## API Endpoints
 
-### Authentication
-- `POST /api/v1/auth/register`: Register a new user
-- `POST /api/v1/auth/login`: Login a user
-- `GET /api/v1/auth/me`: Get current user profile (protected)
-
-### Daily Entries
-- `POST /api/v1/entries`: Create a new daily entry (protected)
-- `GET /api/v1/entries`: Get all entries for the user (protected)
-- `GET /api/v1/entries/:id`: Get a specific entry by ID (protected)
-- `PUT /api/v1/entries/:id`: Update an entry (protected)
-- `PATCH /api/v1/entries/:id`: Partially update an entry (protected)
-- `DELETE /api/v1/entries/:id`: Delete an entry (protected)
-- `GET /api/v1/entries/:id/generate-summary`: Generate a new AI summary for an entry (protected)
-
-## API Endpoints
-
 All data-modifying and data-retrieval endpoints (except for register/login) are protected and require a Bearer Token in the `Authorization` header.
 
 * **Authentication (`/api/auth`)**
