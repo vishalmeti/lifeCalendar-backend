@@ -1,11 +1,11 @@
 let DailyEntry;
 try {
   // First try with capital D
-  DailyEntry = require('../../models/DailyEntry');
+  DailyEntry = require('../../models/dailyEntry');
 } catch (err) {
   try {
+    DailyEntry = require('../../models/DailyEntry');
     // If that fails, try with lowercase d
-    DailyEntry = require('../../models/dailyEntry');
   } catch (secondErr) {
     // If both fail, log detailed error information
     console.error('Failed to load DailyEntry model with either case:');
