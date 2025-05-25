@@ -81,15 +81,39 @@ http://localhost:3000/api/v1/api-docs
 - `DELETE /api/v1/entries/:id`: Delete an entry (protected)
 - `GET /api/v1/entries/:id/generate-summary`: Generate a new AI summary for an entry (protected)
 
-## Data Models
+## API Endpoints
 
-### User
-- Username, email, password (hashed)
+All data-modifying and data-retrieval endpoints (except for register/login) are protected and require a Bearer Token in the `Authorization` header.
 
-### Daily Entry
-- Date, mood, journal notes, meetings, tasks
+* **Authentication (`/api/auth`)**
+    * `POST /register`: Register a new user.
+    * `POST /login`: Log in an existing user and receive a JWT.
+    * `GET /user`: Get details of the currently authenticated user (protected).
 
-### Summary
+* **Daily Entries (`/api/entries`)**
+    * `POST /`: Create a new daily entry (AI summary is generated and stored in the `Summary` collection).
+    * `GET /`: Get all daily entries for the logged-in user (with populated summaries).
+    * `GET /:id`: Get a specific daily entry by ID (with populated summary).
+    * `PUT /:id`: Update a daily entry by ID (AI summary is re-generated/updated).
+    * `DELETE /:id`: Delete a daily entry by ID (associated summary is also deleted).
+    * `POST /:id/generate-summary`: On-demand (re-)generation of the AI summary for a specific entry.
+
+* **Stories (`/api/stories`)**
+    * `POST /generate`: Generate a new AI story based on daily entries/summaries within a specified date range.
+    * `GET /`: Get all generated stories for the logged-in user.
+    * `GET /:id`: Get a specific story by ID.
+    * `DELETE /:id`: Delete a story by ID.
+
+* **Chatbot (`/api/chatbot`)**
+    * `POST /query`: Submit a natural language query (e.g., "When did I start Project X?") to the chatbot. The backend searches relevant summaries and uses Gemini AI to formulate a response.
+
+## 🤖 AI Integration
+
+This backend heavily utilizes Google's Gemini AI for:
+* **Daily Summarization:** Condensing daily activities (meetings, tasks, mood, journal notes) into concise summaries.
+* **Story Generation:** Weaving narratives from a series of daily entries/summaries to create a "storybook" or timeline reflection.
+* **Chatbot Assistance:** Understanding user queries about their past activities and generating helpful responses based on their stored data.
+
 - AI-generated summary text linked to a daily entry
 
 ## License
