@@ -28,17 +28,17 @@ const DailyEntrySchema = new mongoose.Schema({
     type: String,
     // enum limits the possible values for mood
     enum: [
-      'happy', 'sad', 'neutral', 'excited', 'stressed', 'calm', 
+      'happy', 'sad', 'neutral', 'excited', 'motivated', 'stressed', 'calm', 
       'anxious', 'grateful', 'productive', 'tired', 'other'
     ]
   },
   journalNotes: {
     type: String
   },
-  summary: { // This field will store the AI-generated summary for the day
-    type: String,
-    default: '' // Default value if no summary is generated
-  },
+  // summary: { // This field will store the AI-generated summary for the day
+  //   type: String,
+  //   default: '' // Default value if no summary is generated
+  // },
   createdAt: {
     type: Date,
     default: Date.now
@@ -47,12 +47,35 @@ const DailyEntrySchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+},
+{
+  // Ensure virtuals are included when converting to JSON or an Object
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
 // Middleware to update the 'updatedAt' field on save
 DailyEntrySchema.pre('save', function(next) {
   this.updatedAt = Date.now();
   next();
+});
+
+DailyEntrySchema.pre('remove', function(next) {
+    // If there's a summary, you might want to remove it as well
+    const summary = mongoose.model('Summary').findOne({ entry: this._id });
+    if (summary) {
+        summary.remove();
+    }
+  next();
+}
+);
+
+// Virtual for populating the summary from the 'Summary' model
+DailyEntrySchema.virtual('summary', { // Renamed to 'summary' for simpler access if desired
+  ref: 'Summary',       // The model to use for population
+  localField: '_id',    // Find 'Summary' documents where 'localField' (_id of DailyEntry)
+  foreignField: 'entry', // matches 'foreignField' (entry field of Summary)
+  justOne: true         // We expect only one summary per entry (due to unique index in SummarySchema)
 });
 
 // To ensure that a user can only have one entry per day,
