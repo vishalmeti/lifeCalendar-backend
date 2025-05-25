@@ -17,18 +17,16 @@ app.use(express.json({ extended: false }));
 
 const PORT = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
-  res.send('Life Calendar API is starting...');
-});
 
 app.get('/api/v1/test', (req, res) => {
   res.json({ message: 'Test route works' });
 });
 
+// Routes
+app.use('/api/v1/auth', require('./routes/auth'));
+app.use('/api/v1/entries', require('./routes/dailyEntries'));
 
-app.use('/api/v1', require('./routes/auth'));
-
-// console.log('All Routes:', listEndpoints(app));
+console.log('All Routes:', listEndpoints(app));
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
