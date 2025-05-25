@@ -15,13 +15,13 @@ const DailyEntrySchema = new mongoose.Schema({
     time: String, // e.g., "10:00 AM" or a timestamp
     notes: String
   }],
-  habits: [{ // An array of habit objects
-    name: String,
-    completed: Boolean,
-    details: String
-  }],
-  photos: [{ // An array of photo objects
-    url: String,      // URL where the photo is stored (e.g., Cloudinary URL)
+  // habits: [{ // An array of habit objects
+  //   name: String,
+  //   completed: Boolean,
+  //   details: String
+  // }],
+  tasks: [{
+    url: String,
     caption: String
   }],
   mood: {

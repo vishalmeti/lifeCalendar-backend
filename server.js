@@ -3,6 +3,29 @@ require('dotenv').config();
 const express = require('express');
 const mongodb = require('./config/db');
 const listEndpoints = require('express-list-endpoints');
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+// Swagger configuration
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Life Calendar API',
+      version: '1.0.0',
+      description: 'Life Calendar API documentation',
+    },
+    servers: [
+      {
+        url: `http://localhost:${process.env.PORT || 3000}/api/v1`,
+        description: 'Development server',
+      },
+    ],
+  },
+  apis: ['./routes/*.js'],
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
 
 const app = express();
 
@@ -14,6 +37,9 @@ try {
 }
 
 app.use(express.json({ extended: false })); 
+
+// Swagger UI
+app.use('/api/v1/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 const PORT = process.env.PORT || 3000;
 
@@ -30,4 +56,5 @@ console.log('All Routes:', listEndpoints(app));
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  console.log(`Swagger documentation available at http://localhost:${PORT}/api/v1/api-docs`);
 });
