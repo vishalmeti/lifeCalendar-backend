@@ -53,6 +53,7 @@ app.get('/api/v1/test', (req, res) => {
 app.use('/api/v1/auth', require('./routes/auth'));
 app.use('/api/v1/entries', require('./routes/dailyEntries'));
 app.use('/api/v1/stories', require('./routes/story'));
+app.use('/api/v1/chatbot', require('./routes/chatbot'));
 
 // console.log('All Routes:', listEndpoints(app));
 

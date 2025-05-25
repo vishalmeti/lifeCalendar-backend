@@ -139,8 +139,49 @@ async function generateStoryFromEntries(dailySummaries, periodDescription) {
   }
 }
 
+async function generateChatbotResponse(userQuery, searchResultsContext) {
+  // searchResultsContext could be a string like "On YYYY-MM-DD, you mentioned 'Project X'. The summary was: '...'"
+  // Or it could be null/empty if nothing relevant was found.
+
+  let prompt;
+
+  if (searchResultsContext) {
+    prompt = `The user asked: "${userQuery}"
+Based on their life calendar entries, the following information was found:
+${searchResultsContext}
+
+Please provide a helpful and conversational answer to the user's question based *only* on this provided context. If the context doesn't directly answer the question, say that you couldn't find specific information related to their query in the provided context. Be concise.`;
+  } else {
+    prompt = `The user asked: "${userQuery}"
+No specific entries were found in their life calendar that seem to directly match this query.
+Please provide a polite and helpful response acknowledging their query and stating that no specific information was found. You can suggest they try rephrasing or checking their entries.`;
+  }
+
+  console.log("Sending prompt to Gemini for chatbot response:\n", prompt);
+
+  try {
+    const result = await model.generateContent(prompt); // Assuming 'model' is your initialized Gemini model
+    const response = result.response;
+
+    if (response.promptFeedback && response.promptFeedback.blockReason) {
+        console.error('Gemini API Block Reason for chatbot response:', response.promptFeedback.blockReason);
+        return `I encountered an issue processing that: ${response.promptFeedback.blockReason}.`;
+    }
+    if (!response.candidates || response.candidates.length === 0 || !response.candidates[0].content || !response.candidates[0].content.parts || response.candidates[0].content.parts.length === 0) {
+        console.error('Gemini API returned no content for chatbot response.');
+        return "I'm sorry, I couldn't formulate a response at this moment.";
+    }
+
+    const chatResponse = response.candidates[0].content.parts[0].text;
+    return chatResponse.trim();
+  } catch (error) {
+    console.error('Error generating chatbot response with Gemini AI:', error);
+    return "I'm having a little trouble responding right now. Please try again later.";
+  }
+}
 
 module.exports = {
   summarizeDailyEntry,
   generateStoryFromEntries,
+  generateChatbotResponse
 };
