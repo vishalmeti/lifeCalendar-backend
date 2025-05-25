@@ -1,4 +1,31 @@
-const DailyEntry = require('../../models/DailyEntry');
+let DailyEntry;
+try {
+  // First try with capital D
+  DailyEntry = require('../../models/DailyEntry');
+} catch (err) {
+  try {
+    // If that fails, try with lowercase d
+    DailyEntry = require('../../models/dailyEntry');
+  } catch (secondErr) {
+    // If both fail, log detailed error information
+    console.error('Failed to load DailyEntry model with either case:');
+    console.error('Error with uppercase:', err.message);
+    console.error('Error with lowercase:', secondErr.message);
+    
+    // Optional: List files in models directory to debug
+    const fs = require('fs');
+    const path = require('path');
+    try {
+      const modelsDir = path.join(__dirname, '../../models');
+      console.error('Files in models directory:', fs.readdirSync(modelsDir));
+    } catch (fsErr) {
+      console.error('Error listing models directory:', fsErr.message);
+    }
+    
+    // Rethrow the error to stop execution
+    throw new Error('Could not find DailyEntry model with any case variation');
+  }
+}
 // const User = require('../../models/User');
 const Summary = require('../../models/Summary');
 const { summarizeDailyEntry } = require('../../services/aiService');
