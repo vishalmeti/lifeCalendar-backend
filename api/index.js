@@ -58,9 +58,6 @@ app.use('/auth', require('../routes/auth'));
 app.use('/entries', require('../routes/dailyEntries'));
 app.use('/stories', require('../routes/story'));
 
-const handler = serverless(async (req, res) => {
-  await connectDbIfNeeded();
-  return app(req, res);
-});
+const handler = serverless(app);
 
 module.exports = handler;
