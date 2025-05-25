@@ -7,7 +7,8 @@ const {
   getEntryById,
   updateEntry,
   patchEntry,
-  deleteEntry
+  deleteEntry,
+  generateSummaryForEntry
 } = require('../controllers/dailyEntries/dailyEntriesController');
 
 /**
@@ -187,5 +188,6 @@ router.get('/:id', authMiddleware, getEntryById);
 router.put('/:id', authMiddleware, updateEntry);
 router.patch('/:id', authMiddleware, patchEntry);
 router.delete('/:id', authMiddleware, deleteEntry);
+router.get('/:id/generate-summary', authMiddleware, generateSummaryForEntry);
 
 module.exports = router;

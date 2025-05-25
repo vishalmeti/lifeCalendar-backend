@@ -27,13 +27,17 @@ const DailyEntrySchema = new mongoose.Schema({
   mood: {
     type: String,
     // enum limits the possible values for mood
-    enum: ['happy', 'sad', 'neutral', 'excited', 'stressed', 'calm', 'anxious', 'grateful', 'productive', 'tired', 'other']
+    enum: [
+      'happy', 'sad', 'neutral', 'excited', 'stressed', 'calm', 
+      'anxious', 'grateful', 'productive', 'tired', 'other'
+    ]
   },
   journalNotes: {
     type: String
   },
   summary: { // This field will store the AI-generated summary for the day
-    type: String
+    type: String,
+    default: '' // Default value if no summary is generated
   },
   createdAt: {
     type: Date,

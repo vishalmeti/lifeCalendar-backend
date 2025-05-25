@@ -52,7 +52,7 @@ app.get('/api/v1/test', (req, res) => {
 app.use('/api/v1/auth', require('./routes/auth'));
 app.use('/api/v1/entries', require('./routes/dailyEntries'));
 
-console.log('All Routes:', listEndpoints(app));
+// console.log('All Routes:', listEndpoints(app));
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
