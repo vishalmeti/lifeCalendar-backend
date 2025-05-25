@@ -1,5 +1,5 @@
 const DailyEntry = require('../../models/DailyEntry');
-const User = require('../../models/User');
+// const User = require('../../models/User');
 const Summary = require('../../models/Summary');
 const { summarizeDailyEntry } = require('../../services/aiService');
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
