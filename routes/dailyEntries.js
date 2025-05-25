@@ -6,6 +6,7 @@ const {
   getAllEntries,
   getEntryById,
   updateEntry,
+  patchEntry,
   deleteEntry
 } = require('../controllers/dailyEntries/dailyEntriesController');
 
@@ -121,6 +122,45 @@ const {
  *         description: Bad request
  *       404:
  *         description: Entry not found
+ * 
+ *   patch:
+ *     summary: Partially update an entry
+ *     tags: [Entries]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               date:
+ *                 type: string
+ *                 format: date
+ *               mood:
+ *                 type: string
+ *               journalNotes:
+ *                 type: string
+ *               meetings:
+ *                 type: array
+ *               habits:
+ *                 type: array
+ *               photos:
+ *                 type: array
+ *     responses:
+ *       200:
+ *         description: Entry patched successfully
+ *       400:
+ *         description: Bad request
+ *       404:
+ *         description: Entry not found
  *
  *   delete:
  *     summary: Delete an entry
@@ -145,6 +185,7 @@ router.post('/', authMiddleware, createEntry);
 router.get('/', authMiddleware, getAllEntries);
 router.get('/:id', authMiddleware, getEntryById);
 router.put('/:id', authMiddleware, updateEntry);
+router.patch('/:id', authMiddleware, patchEntry);
 router.delete('/:id', authMiddleware, deleteEntry);
 
 module.exports = router;

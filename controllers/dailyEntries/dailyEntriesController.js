@@ -174,6 +174,61 @@ exports.updateEntry = async (req, res) => {
   }
 };
 
+// Patch a daily entry (for partial updates)
+exports.patchEntry = async (req, res) => {
+  try {
+    let entry = await DailyEntry.findById(req.params.id);
+
+    if (!entry) {
+      return res.status(404).json({ msg: 'Entry not found' });
+    }
+
+    if (entry.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'User not authorized to update this entry' });
+    }
+
+    // Handle special case for date changes (if included)
+    if (req.body.date) {
+      const newEntryDate = new Date(req.body.date);
+      newEntryDate.setUTCHours(0, 0, 0, 0);
+
+      // Only check for conflicts if the date is actually changing
+      if (newEntryDate.toISOString().split('T')[0] !== entry.date.toISOString().split('T')[0]) {
+        const existingEntryOnNewDate = await DailyEntry.findOne({
+          user: req.user.id,
+          date: newEntryDate,
+          _id: { $ne: req.params.id } // Exclude the current entry
+        });
+
+        if (existingEntryOnNewDate) {
+          return res.status(400).json({
+            msg: 'An entry for the new date already exists. Cannot change to this date.'
+          });
+        }
+        req.body.date = newEntryDate;
+      }
+    }
+
+    // Update only the fields that are provided in the request
+    const updatedEntry = await DailyEntry.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true, runValidators: true }
+    );
+
+    res.json(updatedEntry);
+  } catch (err) {
+    console.error('Error patching daily entry:', err.message);
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ msg: 'Validation error', errors: err.errors });
+    }
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ msg: 'Entry not found (invalid ID format)' });
+    }
+    res.status(500).send('Server Error');
+  }
+};
+
 // Delete a daily entry
 exports.deleteEntry = async (req, res) => {
   try {
