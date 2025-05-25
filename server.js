@@ -51,6 +51,7 @@ app.get('/api/v1/test', (req, res) => {
 // Routes
 app.use('/api/v1/auth', require('./routes/auth'));
 app.use('/api/v1/entries', require('./routes/dailyEntries'));
+app.use('/api/v1/stories', require('./routes/story'));
 
 // console.log('All Routes:', listEndpoints(app));
 

@@ -28,7 +28,7 @@ const DailyEntrySchema = new mongoose.Schema({
     type: String,
     // enum limits the possible values for mood
     enum: [
-      'happy', 'sad', 'neutral', 'excited', 'motivated', 'stressed', 'calm', 
+      'happy', 'sad', 'neutral', 'excited', 'motivated', 'stressed', 'calm', 'fun',
       'anxious', 'grateful', 'productive', 'tired', 'other'
     ]
   },

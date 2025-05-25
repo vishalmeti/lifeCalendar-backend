@@ -77,38 +77,66 @@ async function summarizeDailyEntry(entryData) {
 
 // generateStoryFromEntries function remains the same as before,
 // but if you use it, ensure its prompt also reflects your schema (e.g., uses 'tasks').
-async function generateStoryFromEntries(entries, periodDescription) {
-    let storyPromptParts = [`Craft an engaging narrative or milestone reflection in the first person, based on the following life entries from ${periodDescription}. Focus on personal growth, significant moments, emotions, and observed patterns. Make it feel like a personal storybook entry.`];
-    if (!entries || entries.length === 0) return "No entries provided to generate a story.";
+async function generateStoryFromEntries(dailySummaries, periodDescription) {
+  // dailySummaries is an array of objects like: { date: 'YYYY-MM-DD', summaryText: '...' }
+  // or full DailyEntry objects with their populated summaries.
 
-    entries.forEach(entry => {
-        let entryDetails = `\nOn ${new Date(entry.date).toLocaleDateString()}:\n`;
-        if (entry.summary) entryDetails += `  My day's summary was: "${entry.summary}"\n`;
-        else {
-            if (entry.journalNotes) entryDetails += `  I wrote in my journal: "${entry.journalNotes}"\n`;
-            if (entry.mood) entryDetails += `  I felt: ${entry.mood}\n`;
-        }
-        if (entry.meetings && entry.meetings.length > 0) entryDetails += `  Key meetings: ${entry.meetings.map(m=>m.title).join(', ')}\n`;
-        // Adapt to 'tasks' if needed for story generation
-        if (entry.tasks && entry.tasks.length > 0) entryDetails += `  Key tasks: ${entry.tasks.map(t=>t.caption).join(', ')}\n`;
-        storyPromptParts.push(entryDetails + "---\n");
-      });
-    const prompt = storyPromptParts.join("\n");
-    console.log("Sending prompt to Gemini for story generation:\n", prompt);
+  let promptParts = [
+    `You are a genz young enthusiast person. Your task is to summarize in the first person, based on the following daily summaries from ${periodDescription}. keep the summary concise, engaging, not too long ,and reflective of my personal journey during this period.`,
+    `Focus on personal growth, significant moments, recurring themes, overall mood progression, and any observed patterns. Make it feel like a personal storybook chapter. Keep the tone reflective and insightful. Highlight key achievements and challenges if mentioned.`
+  ];
 
-    try {
-        const result = await model.generateContent(prompt);
-        const response = result.response;
-        if (response.promptFeedback && response.promptFeedback.blockReason) {
-            return `Story generation blocked: ${response.promptFeedback.blockReason}.`;
-        }
-        if (!response.candidates || response.candidates.length === 0) return "AI didn't return content for story.";
-        const story = response.candidates[0].content.parts[0].text;
-        return story.trim();
-    } catch (error) {
-        console.error('Error generating story with Gemini AI:', error);
-        return "Error generating story.";
+  if (!dailySummaries || dailySummaries.length === 0) {
+    return "Not enough daily information provided to generate a story for this period.";
+  }
+
+  dailySummaries.forEach(item => {
+    // Assuming item is an object { date: Date, summary: { text: String } } or similar structure
+    // from a populated DailyEntry. Adjust access as needed.
+    let entryDateStr = '';
+    if (item.date) {
+        entryDateStr = new Date(item.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     }
+
+    let summaryText = '';
+    if (item.summary && typeof item.summary === 'object' && item.summary.text) { // If summary is populated object
+        summaryText = item.summary.text;
+    } else if (typeof item.summary === 'string') { // If summary is just text (less likely with our current setup)
+        summaryText = item.summary;
+    } else if (item.journalNotes) { // Fallback to journal notes if no summary text
+        summaryText = `Journal: ${item.journalNotes}`;
+    }
+
+
+    if (summaryText) {
+      promptParts.push(`\nOn ${entryDateStr}:\n"${summaryText}"`);
+    }
+  });
+
+  promptParts.push("\nNow, please synthesize these daily notes into a flowing narrative for the period.");
+
+  const prompt = promptParts.join("\n---\n"); // Use a clear separator
+  console.log("Sending prompt to Gemini for story generation:\n", prompt);
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+
+    if (response.promptFeedback && response.promptFeedback.blockReason) {
+        console.error('Gemini API Block Reason for story:', response.promptFeedback.blockReason, response.promptFeedback.safetyRatings);
+        return `Story generation was blocked by the AI for safety reasons (${response.promptFeedback.blockReason}).`;
+    }
+    if (!response.candidates || response.candidates.length === 0 || !response.candidates[0].content || !response.candidates[0].content.parts || response.candidates[0].content.parts.length === 0) {
+        console.error('Gemini API returned no content for story. Response:', JSON.stringify(response, null, 2));
+        return "The AI didn't return any content for the story.";
+    }
+
+    const storyContent = response.candidates[0].content.parts[0].text;
+    return storyContent.trim();
+  } catch (error) {
+    console.error('Error generating story with Gemini AI:', error);
+    return "An error occurred while trying to generate the story with the AI.";
+  }
 }
 
 
