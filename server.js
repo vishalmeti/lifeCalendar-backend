@@ -6,6 +6,7 @@ const listEndpoints = require('express-list-endpoints');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const serverless = require('serverless-http');
+const cors = require('cors');
 
 // Swagger configuration
 const swaggerOptions = {
@@ -29,6 +30,13 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 
 const app = express();
+
+// Configure CORS
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || '*', // You can restrict this to specific origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 try {
     mongodb();
