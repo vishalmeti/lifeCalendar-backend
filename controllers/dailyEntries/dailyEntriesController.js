@@ -108,7 +108,7 @@ exports.getAllEntries = async (req, res) => {
     } else if (endDate) {
       query.date = { $lte: new Date(new Date(endDate).setUTCHours(23,59,59,999)) };
     }
-    const entries = await DailyEntry.find(query).sort({ date: -1 });
+    const entries = await DailyEntry.find(query).populate('summary').sort({ date: -1 });
     res.json(entries);
   } catch (err) { 
     console.error('Error fetching daily entries:', err.message);
@@ -347,8 +347,9 @@ exports.deleteEntry = async (req, res) => {
     }
 
     // Mongoose v5+ `findByIdAndDelete` is a good option
-    await entry.remove();
-    // Or: await entry.remove(); // if you already fetched the entry
+    
+    await entry.deleteOne();
+    // Or use DailyEntry.findByIdAndDelete(req.params.id) if preferred
 
     res.json({ msg: 'Entry removed successfully' });
   } catch (err) {
